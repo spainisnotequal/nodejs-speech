@@ -7,7 +7,7 @@ async function main() {
   const client = new speech.SpeechClient();
 
   // The name of the audio file to transcribe
-  const fileName = "./audios/mono.wav";
+  const fileName = "./audios/refran.wav";
 
   // Reads a local audio file and converts it to base64
   const file = fs.readFileSync(fileName);
@@ -21,6 +21,7 @@ async function main() {
     encoding: "LINEAR16",
     sampleRateHertz: 16000,
     languageCode: "es-ES",
+    enableWordTimeOffsets: true,
   };
   const request = {
     audio: audio,
@@ -33,5 +34,23 @@ async function main() {
     .map((result) => result.alternatives[0].transcript)
     .join("\n");
   console.log(`Transcription: ${transcription}`);
+
+  // Log words and timestamps
+  response.results.map((result) => {
+    result.alternatives[0].words.map((wordInfo) => {
+      // NOTE: If you have a time offset exceeding 2^32 seconds, use the
+      // wordInfo.{x}Time.seconds.high to calculate seconds.
+      const startSecs =
+        `${wordInfo.startTime.seconds}` +
+        `.` +
+        wordInfo.startTime.nanos / 100000000;
+      const endSecs =
+        `${wordInfo.endTime.seconds}` +
+        `.` +
+        wordInfo.endTime.nanos / 100000000;
+      console.log(`Word: ${wordInfo.word}`);
+      console.log(`\t ${startSecs} secs - ${endSecs} secs`);
+    });
+  });
 }
 main().catch(console.error);
