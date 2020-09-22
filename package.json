@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/spainisnotequal/nodejs-speech#readme",
   "dependencies": {
-    "@google-cloud/speech": "^3.6.0"
+    "@google-cloud/speech": "^4.1.3"
   }
 }
